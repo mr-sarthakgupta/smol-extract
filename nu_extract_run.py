@@ -4,16 +4,16 @@ import torch
 from typing import Type
 import json
 import re
+import ast
 
 def extract_last_dict(json_string: str) -> dict:
-    pattern = r'\{\s*(?:[^{}]*?\s*:\s*[^{}]*?\s*,?\s*)*\s*\}\s*$'
-    dict_in_text = re.search(pattern, json_string).group()
+    dict_in_text = ast.literal_eval(json_string.split('### Text')[0])
     return dict_in_text
     
 
 class NuExtractRun():
     def __init__(self):
-        self.generator = HuggingFaceLocalGenerator(model="numind/NuExtract-1.5-tiny", huggingface_pipeline_kwargs={"model_kwargs": {"torch_dtype":torch.bfloat16}})
+        self.generator = HuggingFaceLocalGenerator(model="numind/NuExtract-1.5", huggingface_pipeline_kwargs={"model_kwargs": {"torch_dtype":torch.bfloat16}})
         self.generator.warm_up()
 
     def extract_json(self, pydantic_obj: Type[BaseModel], text: str) -> dict:
@@ -28,13 +28,7 @@ class NuExtractRun():
         """
         generated_text = self.generator.run(prompt)      
         extracted_data = extract_last_dict(generated_text['replies'][0])
-       
-        print('meow')
-        print(extracted_data)
-        print('meow')
-        exit()
-        validated_data = pydantic_obj.parse_obj(extracted_data)
-        return validated_data.dict()
+        return extracted_data
 
 if __name__ == "__main__":
     class CarModel(BaseModel):
