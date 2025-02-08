@@ -30,7 +30,8 @@ class OllamaModelDeployment:
         
         # Get repository URI
         response = ecr_client.describe_repositories(repositoryNames=[repository_name])
-        repository_uri = response['repositories'][0]['repositoryUri']
+        # repository_uri = response['repositories'][0]['repositoryUri']
+        repository_uri = "235494792698.dkr.ecr.us-east-1.amazonaws.com/sagemaker-ollama-deepseek"
         
         # Build and push Docker image (requires docker CLI)
         import subprocess
